@@ -8,6 +8,8 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
+import { AuthService } from '../../services/auth.service';
+
 const equalPasswords = (control: AbstractControl) => {
   const password = control.get('password')?.value;
   const confirmPassword = control.get('confirmPassword')?.value;
@@ -21,17 +23,17 @@ const equalPasswords = (control: AbstractControl) => {
 
 @Component({
   selector: 'app-register',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent {
   registerForm: FormGroup;
+  errorMessage: string = '';
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private authService: AuthService) {
     this.registerForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
+      userName: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
       passwords: this.fb.group(
         {
@@ -44,10 +46,20 @@ export class RegisterComponent {
   }
 
   onSubmit() {
-    if (this.registerForm.valid) {
-      console.log('User Registered:', this.registerForm.value);
-    } else {
-      console.log('Form is invalid');
-    }
+    if (this.registerForm.invalid) return;
+
+    const { userName, email, passwords } = this.registerForm.value;
+
+    this.authService
+      .register({ userName, email, password: passwords.password })
+      .subscribe({
+        next: () => {
+          console.log('User registered successfully');
+        },
+        error: (err) => {
+          console.error('Registration failed:', err);
+          this.errorMessage = 'Registration failed. Please try again.';
+        },
+      });
   }
 }

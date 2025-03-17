@@ -3,15 +3,15 @@
 
   <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
     <div>
-      <label for="username" class="block text-sm font-medium">Username</label>
+      <label for="userName" class="block text-sm font-medium">Username</label>
       <input
-        id="username"
-        formControlName="username"
+        id="userName"
+        formControlName="userName"
         type="text"
         class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400"
       />
-      @if (registerForm.get('username')?.invalid &&
-      registerForm.get('username')?.touched) {
+      @if (registerForm.get('userName')?.invalid &&
+      registerForm.get('userName')?.touched) {
       <small class="text-red-500 text-sm"
         >Username must be at least 3 characters.</small
       >
@@ -71,10 +71,14 @@
       </div>
     </div>
 
+    @if (errorMessage) {
+    <p class="text-red-500">{{ errorMessage }}</p>
+    }
+
     <button
       type="submit"
       [disabled]="registerForm.invalid"
-      class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400"
+      class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed hover:cursor-pointer"
     >
       Register
     </button>
