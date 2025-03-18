@@ -7,7 +7,6 @@
 
     <form [formGroup]="surveyForm" (ngSubmit)="onSubmit()" class="space-y-4">
       <h2 class="text-xl font-semibold text-gray-800">Add Survey</h2>
-      <!-- Survey Title -->
       <div class="form-group">
         <label for="title" class="block text-sm font-medium text-gray-700"
           >Survey Title</label
@@ -28,38 +27,42 @@
         }
       </div>
 
-      <!-- Category Selection (Placeholder) -->
-      <!-- <div class="form-group">
-        <label for="categories">Categories</label>
-        <select id="categories" formControlName="categoryIds" multiple>
-          @for (category of []; track $index) {
-            <option  [value]="category.id">
-              {{ category.name }}
-            </option>
+      <div class="form-group">
+        <label for="categoryIds" class="block text-sm font-medium text-gray-700"
+          >Categories</label
+        >
+        <select
+          id="categoryIds"
+          formControlName="categoryIds"
+          multiple
+          class="mt-1 block w-full p-2 border rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+        >
+          @for (category of categories; track category.id) {
+          <option [value]="category.id">{{ category.name }}</option>
+          } @empty {
+          <option>No categories available</option>
           }
-          
         </select>
-      </div> -->
+      </div>
 
       <div formArrayName="questions">
         <label class="block text-sm font-medium text-gray-700">Questions</label>
-        <div
-          *ngFor="let question of questions.controls; let i = index"
-          class="flex gap-2 items-center"
-        >
+        @for (question of questions.controls; track question) {
+        <div class="flex gap-2 items-center">
           <input
-            [formControlName]="i"
+            [formControlName]="questions.controls.indexOf(question)"
             placeholder="Enter a question"
             class="mt-1 block w-full p-2 border rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
           />
           <button
             type="button"
-            (click)="removeQuestion(i)"
+            (click)="removeQuestion(questions.controls.indexOf(question))"
             class="px-2 bg-red-500 text-white rounded"
           >
             X
           </button>
         </div>
+        }
         <button
           type="button"
           (click)="addQuestion()"

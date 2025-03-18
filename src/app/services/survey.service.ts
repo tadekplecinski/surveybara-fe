@@ -6,6 +6,7 @@ export interface SurveyPayload {
   title: string;
   status: 'draft' | 'published';
   questions: string[];
+  categoryIds: number[];
 }
 
 @Injectable({
