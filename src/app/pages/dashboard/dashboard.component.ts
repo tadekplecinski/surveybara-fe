@@ -3,31 +3,41 @@ import { Subscription } from 'rxjs';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 import { AuthService } from '../../services/auth.service';
 import { AddSurveyModalComponent } from '../../components/add-survey-modal/add-survey-modal.component';
 import { Survey, SurveyService } from '../../services/survey.service';
+import { UpdateSurveyModalComponent } from '../../components/update-survey-modal/update-survey-modal.component';
 
 @Component({
   selector: 'app-dashboard',
   imports: [
     AddSurveyModalComponent,
+    UpdateSurveyModalComponent,
     MatTableModule,
     CommonModule,
     MatSortModule,
+    MatMenuModule,
+    MatIconModule,
+    MatButtonModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent {
   private authService = inject(AuthService);
-  showModal = false;
+  showCreateModal = false;
+  showUpdateModal = false;
 
   userRole: string | null = null;
   private userRoleSubscription: Subscription | null = null;
   private surveysSubscription: Subscription | null = null;
 
   @ViewChild(MatSort) sort!: MatSort;
+  selectedSurvey: Survey | null = null;
 
   surveys = new MatTableDataSource<Survey>([]);
   displayedColumns: string[] = [
@@ -37,6 +47,7 @@ export class DashboardComponent {
     'createdAt',
     'updatedAt',
     'categories',
+    'actions',
   ];
 
   constructor(private surveyService: SurveyService) {}
@@ -47,7 +58,7 @@ export class DashboardComponent {
 
   ngOnInit(): void {
     this.loadSurveys();
-    // TODO: remove, dashboards will be separated by role anyway
+    // TODO: remove???, dashboards will be separated by role anyway
     this.userRoleSubscription = this.authService.userRole$.subscribe((role) => {
       this.userRole = role;
     });
@@ -74,16 +85,34 @@ export class DashboardComponent {
     }
   }
 
-  openModal() {
-    this.showModal = true;
+  openCreateModal() {
+    this.showCreateModal = true;
   }
 
+  openUpdateModal(survey: Survey) {
+    this.showUpdateModal = true;
+    this.selectedSurvey = survey;
+  }
+
+  // refactor!
   closeModal() {
-    this.showModal = false;
+    this.showCreateModal = false;
+    this.showUpdateModal = false;
+    this.selectedSurvey = null;
     this.loadSurveys();
   }
 
   get isAdmin(): boolean {
     return this.userRole === 'admin';
+  }
+
+  duplicateSurvey(survey: Survey) {
+    console.log('Duplicate survey:', survey);
+    // Implement the logic to duplicate the survey
+  }
+
+  deleteSurvey(survey: Survey) {
+    console.log('Delete survey:', survey);
+    // Implement the logic to confirm and delete the survey
   }
 }

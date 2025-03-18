@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -6,25 +6,24 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { SurveyService } from '../../services/survey.service';
+import { Survey, SurveyService } from '../../services/survey.service';
 import { Category, CategoryService } from '../../services/category.service';
 
 @Component({
-  selector: 'app-add-survey-modal',
+  selector: 'app-update-survey-modal',
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './add-survey-modal.component.html',
-  styleUrls: ['./add-survey-modal.component.scss'],
+  templateUrl: './update-survey-modal.component.html',
+  styleUrls: ['./update-survey-modal.component.scss'],
 })
-export class AddSurveyModalComponent {
+export class UpdateSurveyModalComponent {
   private fb = inject(FormBuilder);
   private surveyService = inject(SurveyService);
   private categoryService = inject(CategoryService);
-  private router = inject(Router);
 
   categories: Category[] = [];
   @Output() close = new EventEmitter<void>();
+  @Input() survey: Survey | null = null; // Survey data passed for editing
 
   surveyForm: FormGroup;
   errorMessage: string | null = null;
@@ -39,7 +38,12 @@ export class AddSurveyModalComponent {
   }
 
   ngOnInit(): void {
+    console.log('this.survey', this.survey);
+
     this.loadCategories();
+    if (this.survey) {
+      this.populateForm(this.survey);
+    }
   }
 
   loadCategories(): void {
@@ -59,11 +63,33 @@ export class AddSurveyModalComponent {
   }
 
   addQuestion() {
-    this.questions.push(this.fb.control('', Validators.required));
+    this.questions.push(
+      this.fb.group({
+        id: [null],
+        question: ['', Validators.required],
+      })
+    );
   }
 
   removeQuestion(index: number) {
     this.questions.removeAt(index);
+  }
+
+  populateForm(survey: Survey): void {
+    this.surveyForm.patchValue({
+      title: survey.title,
+      categoryIds: survey.categories.map((category) => category.id),
+      status: survey.status,
+    });
+
+    survey.questions.forEach((question) => {
+      this.questions.push(
+        this.fb.group({
+          id: [question.id],
+          question: [question.question, Validators.required],
+        })
+      );
+    });
   }
 
   closeModal() {
@@ -74,14 +100,21 @@ export class AddSurveyModalComponent {
   onSubmit() {
     if (this.surveyForm.invalid) return;
 
-    this.surveyService.createSurvey(this.surveyForm.value).subscribe({
+    const updatedSurvey = {
+      ...this.surveyForm.value,
+      questions: this.surveyForm.value.questions.map((q: any) => ({
+        ...(q.id ? { id: q.id } : {}), // BE is not expecting id: null -> remove id
+        question: q.question,
+      })),
+    };
+
+    this.surveyService.updateSurvey(this.survey?.id!, updatedSurvey).subscribe({
       next: () => {
         this.closeModal();
-        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         this.errorMessage = err.message;
-        console.error('Survey creation error:', err);
+        console.error('Survey update error:', err);
       },
     });
   }

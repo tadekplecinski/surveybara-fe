@@ -1,11 +1,16 @@
-@if (showModal) {
-<app-add-survey-modal (close)="closeModal()"></app-add-survey-modal>
+@if(showCreateModal) {<app-add-survey-modal
+  (close)="closeModal()"
+></app-add-survey-modal
+>} @if(showUpdateModal) {
+
+<app-update-survey-modal [survey]="selectedSurvey" (close)="closeModal()">
+</app-update-survey-modal>
 }
 
 <div class="flex flex-col gap-2 items-center items-center justify-center p-6">
   @if (isAdmin) {
   <button
-    (click)="openModal()"
+    (click)="openCreateModal()"
     class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
   >
     Add Survey
@@ -44,6 +49,26 @@
         <span *ngFor="let category of survey.categories; let last = last">
           {{ category.name }}{{ !last ? ", " : "" }}
         </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let survey">
+        <button mat-icon-button [matMenuTriggerFor]="menu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="openUpdateModal(survey)">
+            <mat-icon>edit</mat-icon> Edit
+          </button>
+          <button mat-menu-item (click)="duplicateSurvey(survey)">
+            <mat-icon>content_copy</mat-icon> Duplicate
+          </button>
+          <button mat-menu-item (click)="deleteSurvey(survey)">
+            <mat-icon>delete</mat-icon> Delete
+          </button>
+        </mat-menu>
       </td>
     </ng-container>
 

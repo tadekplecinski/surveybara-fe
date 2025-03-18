@@ -59,6 +59,28 @@ export class SurveyService {
       );
   }
 
+  updateSurvey(
+    id: number,
+    updatedSurvey: Omit<Survey, 'id'>
+  ): Observable<Survey> {
+    const token = this.authService.getToken();
+
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+
+    return this.http.put<Survey>(
+      `${this.apiUrl}/admin/survey/${id}`,
+      updatedSurvey,
+      { headers }
+    );
+  }
+
   getSurveys(): Observable<Survey[]> {
     const token = this.authService.getToken();
     if (!token) {
