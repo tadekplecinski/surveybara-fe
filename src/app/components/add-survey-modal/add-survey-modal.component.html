@@ -1,0 +1,105 @@
+<div
+  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+>
+  <dialog open class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md m-auto">
+    <!-- Permission Denied Message -->
+    <!-- <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p> -->
+
+    <form [formGroup]="surveyForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <h2 class="text-xl font-semibold text-gray-800">Add Survey</h2>
+      <!-- Survey Title -->
+      <div class="form-group">
+        <label for="title" class="block text-sm font-medium text-gray-700"
+          >Survey Title</label
+        >
+        <input
+          id="title"
+          type="text"
+          formControlName="title"
+          placeholder="Enter survey title"
+          class="mt-1 block w-full p-2 border rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+        />
+
+        @if ( surveyForm.get('title')?.invalid &&
+        surveyForm.get('title')?.touched) {
+        <small class="text-red-500 text-sm"
+          >Title is required (min. 3 characters)</small
+        >
+        }
+      </div>
+
+      <!-- Category Selection (Placeholder) -->
+      <!-- <div class="form-group">
+        <label for="categories">Categories</label>
+        <select id="categories" formControlName="categoryIds" multiple>
+          @for (category of []; track $index) {
+            <option  [value]="category.id">
+              {{ category.name }}
+            </option>
+          }
+          
+        </select>
+      </div> -->
+
+      <div formArrayName="questions">
+        <label class="block text-sm font-medium text-gray-700">Questions</label>
+        <div
+          *ngFor="let question of questions.controls; let i = index"
+          class="flex gap-2 items-center"
+        >
+          <input
+            [formControlName]="i"
+            placeholder="Enter a question"
+            class="mt-1 block w-full p-2 border rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+          />
+          <button
+            type="button"
+            (click)="removeQuestion(i)"
+            class="px-2 bg-red-500 text-white rounded"
+          >
+            X
+          </button>
+        </div>
+        <button
+          type="button"
+          (click)="addQuestion()"
+          class="mt-2 px-4 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        >
+          + Add Question
+        </button>
+      </div>
+
+      <!-- Status Selection -->
+      <div class="form-group">
+        <label for="status" class="block text-sm font-medium text-gray-700"
+          >Status</label
+        >
+        <select
+          id="status"
+          formControlName="status"
+          class="mt-1 block w-full p-2 border rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+        >
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+        </select>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-4">
+        <button
+          type="submit"
+          [disabled]="surveyForm.invalid"
+          class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md disabled:opacity-50 hover:bg-green-700"
+        >
+          Create Survey
+        </button>
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </dialog>
+</div>

@@ -16,6 +16,7 @@ interface LoginPayload {
 
 interface AuthResponse {
   accessToken: string;
+  role: 'user' | 'admin';
 }
 
 @Injectable({
@@ -24,16 +25,37 @@ interface AuthResponse {
 export class AuthService {
   private apiUrl = 'http://localhost:8080/v1';
   private tokenKey = 'auth_token';
+  private roleKey = 'user_role';
 
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(
     this.hasToken()
   );
   isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  constructor(private http: HttpClient, private router: Router) {}
+  private userRoleSubject = new BehaviorSubject<string | null>(
+    this.getStoredRole()
+  );
+  userRole$ = this.userRoleSubject.asObservable();
+
+  constructor(private http: HttpClient, private router: Router) {
+    this.loadAuthState();
+  }
 
   private hasToken(): boolean {
     return !!localStorage.getItem('token');
+  }
+
+  private loadAuthState(): void {
+    const token = this.getToken();
+    const role = this.getStoredRole();
+
+    if (token) {
+      this.isAuthenticatedSubject.next(true);
+    }
+
+    if (role) {
+      this.userRoleSubject.next(role);
+    }
   }
 
   register(payload: RegisterPayload): Observable<AuthResponse> {
@@ -44,7 +66,7 @@ export class AuthService {
           if (!response.accessToken) {
             throw new Error('No access token received.');
           }
-          this.handleAuthSuccess(response.accessToken);
+          this.handleAuthSuccess(response);
         })
       );
   }
@@ -55,25 +77,33 @@ export class AuthService {
         if (!response.accessToken) {
           throw new Error('No access token received.');
         }
-        this.handleAuthSuccess(response.accessToken);
+        this.handleAuthSuccess(response);
       })
     );
   }
 
-  private handleAuthSuccess(token: string) {
-    localStorage.setItem(this.tokenKey, token);
+  private handleAuthSuccess({ accessToken, role }: AuthResponse) {
+    localStorage.setItem(this.tokenKey, accessToken);
+    localStorage.setItem(this.roleKey, role);
     this.isAuthenticatedSubject.next(true);
+    this.userRoleSubject.next(role);
     this.router.navigate(['/dashboard']);
   }
 
   logout(): void {
     localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.roleKey);
     this.isAuthenticatedSubject.next(false);
+    this.userRoleSubject.next(null);
     this.router.navigate(['/']);
   }
 
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
+  }
+
+  getStoredRole(): string | null {
+    return localStorage.getItem(this.roleKey);
   }
 
   isAuthenticated(): boolean {

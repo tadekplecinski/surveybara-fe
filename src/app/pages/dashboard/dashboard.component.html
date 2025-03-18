@@ -1,4 +1,14 @@
-<div class="p-6">
-  <h1 class="text-2xl font-bold">Welcome to the Dashboard!</h1>
-  <p class="text-gray-600">This is your main area.</p>
+@if (showModal) {
+<app-add-survey-modal (close)="closeModal()"></app-add-survey-modal>
+}
+
+<div class="flex flex-row gap-2 items-center items-center justify-center p-6">
+  @if (isAdmin) {
+  <button
+    (click)="openModal()"
+    class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+  >
+    Add Survey
+  </button>
+  }
 </div>
