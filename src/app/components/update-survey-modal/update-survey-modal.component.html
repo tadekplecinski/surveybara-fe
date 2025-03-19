@@ -49,11 +49,8 @@
 
       <div formArrayName="questions">
         <label class="block text-sm font-medium text-gray-700">Questions</label>
-        @for (question of questions.controls; track question) {
-        <div
-          [formGroupName]="questions.controls.indexOf(question)"
-          class="flex gap-2 items-center"
-        >
+        @for (question of questions.controls; track question; let i = $index) {
+        <div [formGroupName]="i" class="flex gap-2 items-center">
           <input
             formControlName="question"
             placeholder="Enter a question"
@@ -62,7 +59,7 @@
           @if(!readonlyMode) {
           <button
             type="button"
-            (click)="removeQuestion(questions.controls.indexOf(question))"
+            (click)="removeQuestion(i)"
             class="px-2 bg-red-500 text-white rounded"
           >
             X

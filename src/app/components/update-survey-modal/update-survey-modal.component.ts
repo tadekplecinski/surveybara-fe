@@ -111,7 +111,7 @@ export class UpdateSurveyModalComponent {
       })),
     };
 
-    this.surveyService.updateSurvey(this.survey?.id!, updatedSurvey).subscribe({
+    this.surveyService.updateSurvey(this.survey!.id, updatedSurvey).subscribe({
       next: () => {
         this.closeModal();
       },

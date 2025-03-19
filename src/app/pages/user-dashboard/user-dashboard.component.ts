@@ -9,12 +9,14 @@ import { MatButtonModule } from '@angular/material/button';
 
 import {
   UserSurveyService,
-  UserSurveysParsed,
+  UserSurveyParsed,
 } from '../../services/user-survey.service';
+import { RespondModalComponent } from '../../components/respond-modal/respond-modal.component';
 
 @Component({
   selector: 'app-user-dashboard',
   imports: [
+    RespondModalComponent,
     MatTableModule,
     CommonModule,
     MatSortModule,
@@ -26,11 +28,11 @@ import {
   styleUrls: ['./user-dashboard.component.scss'],
 })
 export class UserDashboardComponent {
-  showAnswerModal = false;
+  showRespondModal = false;
   showPreviewModal = false;
   readonlyMode = false;
-  selectedUserSurvey: UserSurveysParsed | null = null;
-  surveys = new MatTableDataSource<UserSurveysParsed>([]);
+  selectedUserSurvey: UserSurveyParsed | null = null;
+  surveys = new MatTableDataSource<UserSurveyParsed>([]);
 
   private userSurveysSubscription: Subscription | null = null;
 
@@ -74,18 +76,22 @@ export class UserDashboardComponent {
     }
   }
 
-  openAnswerModal(survey: UserSurveysParsed, readonly = false) {
-    this.showAnswerModal = true;
+  openRespondModal(survey: UserSurveyParsed, readonly = false) {
+    this.showRespondModal = true;
     this.selectedUserSurvey = survey;
     this.readonlyMode = readonly;
   }
 
-  openPreviewModal(survey: UserSurveysParsed) {
-    this.openAnswerModal(survey, true);
+  openPreviewModal(survey: UserSurveyParsed) {
+    this.openRespondModal(survey, true);
+  }
+
+  submitUserSurvey(survey: UserSurveyParsed) {
+    // logic to submit the survey
   }
 
   closeModal() {
-    this.showAnswerModal = false;
+    this.showRespondModal = false;
     this.showPreviewModal = false;
     this.loadSurveys();
   }

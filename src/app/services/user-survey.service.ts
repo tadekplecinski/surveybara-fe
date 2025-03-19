@@ -23,7 +23,7 @@ export interface UserSurveyResponse {
   }[];
 }
 
-export interface UserSurveysParsed {
+export interface UserSurveyParsed {
   id: number;
   status: 'draft' | 'submitted';
   createdAt: string;
@@ -45,7 +45,7 @@ export class UserSurveyService {
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
-  getUserSurveys(): Observable<UserSurveysParsed[]> {
+  getUserSurveys(): Observable<UserSurveyParsed[]> {
     const token = this.authService.getToken();
     if (!token) {
       return throwError(() => new Error('No authorization token found.'));
@@ -73,6 +73,40 @@ export class UserSurveyService {
         catchError((error) => {
           console.error('Failed to fetch surveys:', error);
           let errorMessage = 'Failed to fetch surveys. Please try again later.';
+
+          if (error.status === 400) {
+            errorMessage = 'Invalid request. Please check your input.';
+          }
+
+          return throwError(() => new Error(errorMessage));
+        })
+      );
+  }
+
+  updateUserSurvey(
+    surveyId: number,
+    updatedSurvey: UserSurveyParsed
+  ): Observable<UserSurveyParsed> {
+    const token = this.authService.getToken();
+    if (!token) {
+      return throwError(() => new Error('No authorization token found.'));
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+
+    return this.http
+      .put<UserSurveyParsed>(
+        `${this.apiUrl}/survey/${surveyId}`,
+        updatedSurvey,
+        { headers }
+      )
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to update survey:', error);
+          let errorMessage = 'Failed to update survey. Please try again later.';
 
           if (error.status === 400) {
             errorMessage = 'Invalid request. Please check your input.';

@@ -47,16 +47,16 @@
 
       <div formArrayName="questions">
         <label class="block text-sm font-medium text-gray-700">Questions</label>
-        @for (question of questions.controls; track question) {
+        @for (question of questions.controls; track question; let i = $index) {
         <div class="flex gap-2 items-center">
           <input
-            [formControlName]="questions.controls.indexOf(question)"
+            [formControlName]="i"
             placeholder="Enter a question"
             class="mt-1 block w-full p-2 border rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
           />
           <button
             type="button"
-            (click)="removeQuestion(questions.controls.indexOf(question))"
+            (click)="removeQuestion(i)"
             class="px-2 bg-red-500 text-white rounded"
           >
             X
