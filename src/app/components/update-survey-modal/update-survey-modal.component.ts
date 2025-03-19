@@ -23,7 +23,8 @@ export class UpdateSurveyModalComponent {
 
   categories: Category[] = [];
   @Output() close = new EventEmitter<void>();
-  @Input() survey: Survey | null = null; // Survey data passed for editing
+  @Input() survey: Survey | null = null;
+  @Input() readonlyMode = false;
 
   surveyForm: FormGroup;
   errorMessage: string | null = null;
@@ -38,8 +39,6 @@ export class UpdateSurveyModalComponent {
   }
 
   ngOnInit(): void {
-    console.log('this.survey', this.survey);
-
     this.loadCategories();
     if (this.survey) {
       this.populateForm(this.survey);
@@ -90,6 +89,10 @@ export class UpdateSurveyModalComponent {
         })
       );
     });
+
+    if (this.readonlyMode) {
+      this.surveyForm.disable();
+    }
   }
 
   closeModal() {

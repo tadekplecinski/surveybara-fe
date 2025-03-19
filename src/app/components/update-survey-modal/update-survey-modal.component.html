@@ -6,7 +6,9 @@
     class="bg-white w-full max-w-md p-6 rounded-lg shadow-lg relative border border-gray-300"
   >
     <form [formGroup]="surveyForm" (ngSubmit)="onSubmit()" class="space-y-4">
-      <h2 class="text-xl font-semibold text-gray-800">Update Survey</h2>
+      <h2 class="text-xl font-semibold text-gray-800">
+        {{ readonlyMode ? "Survey Preview" : "Update Survey" }}
+      </h2>
       <div class="form-group">
         <label for="title" class="block text-sm font-medium text-gray-700"
           >Survey Title</label
@@ -57,6 +59,7 @@
             placeholder="Enter a question"
             class="mt-1 block w-full p-2 border rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
           />
+          @if(!readonlyMode) {
           <button
             type="button"
             (click)="removeQuestion(questions.controls.indexOf(question))"
@@ -64,8 +67,10 @@
           >
             X
           </button>
+
+          }
         </div>
-        }
+        } @if(!readonlyMode) {
         <button
           type="button"
           (click)="addQuestion()"
@@ -73,9 +78,9 @@
         >
           + Add Question
         </button>
+        }
       </div>
 
-      <!-- Status Selection -->
       <div class="form-group">
         <label for="status" class="block text-sm font-medium text-gray-700"
           >Status</label
@@ -91,13 +96,14 @@
       </div>
 
       <div class="flex justify-end gap-3 mt-4">
+        @if(!readonlyMode) {
         <button
           type="submit"
           [disabled]="surveyForm.invalid"
           class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md disabled:opacity-50 hover:bg-green-700"
         >
-          Update Survey
-        </button>
+          Update Survey</button
+        >}
         <button
           type="button"
           (click)="closeModal()"

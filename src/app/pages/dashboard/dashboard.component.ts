@@ -41,6 +41,7 @@ export class DashboardComponent {
 
   @ViewChild(MatSort) sort!: MatSort;
   selectedSurvey: Survey | null = null;
+  readonlyMode = false;
 
   surveys = new MatTableDataSource<Survey>([]);
   displayedColumns: string[] = [
@@ -92,14 +93,19 @@ export class DashboardComponent {
     this.showCreateModal = true;
   }
 
-  openUpdateModal(survey: Survey) {
+  openUpdateModal(survey: Survey, readonly = false) {
     this.showUpdateModal = true;
     this.selectedSurvey = survey;
+    this.readonlyMode = readonly;
   }
 
   openInviteModal(survey: Survey) {
     this.showInviteModal = true;
     this.selectedSurvey = survey;
+  }
+
+  openPreviewModal(survey: Survey) {
+    this.openUpdateModal(survey, true);
   }
 
   // refactor!
@@ -113,10 +119,5 @@ export class DashboardComponent {
 
   get isAdmin(): boolean {
     return this.userRole === 'admin';
-  }
-
-  deleteSurvey(survey: Survey) {
-    console.log('Delete survey:', survey);
-    // Implement the logic to confirm and delete the survey
   }
 }

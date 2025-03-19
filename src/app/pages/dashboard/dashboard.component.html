@@ -2,7 +2,11 @@
   (close)="closeModal()"
 ></app-add-survey-modal
 >} @if(showUpdateModal) {
-<app-update-survey-modal [survey]="selectedSurvey" (close)="closeModal()">
+<app-update-survey-modal
+  [survey]="selectedSurvey"
+  [readonlyMode]="readonlyMode"
+  (close)="closeModal()"
+>
 </app-update-survey-modal>
 } @if(showInviteModal) {
 <app-invite-user-modal [survey]="selectedSurvey" (close)="closeModal()">
@@ -75,8 +79,8 @@
           >
             <mat-icon>content_copy</mat-icon> Invite
           </button>
-          <button mat-menu-item (click)="deleteSurvey(survey)">
-            <mat-icon>delete</mat-icon> Delete
+          <button mat-menu-item (click)="openPreviewModal(survey)">
+            <mat-icon>visibility</mat-icon> Preview
           </button>
         </mat-menu>
       </td>
