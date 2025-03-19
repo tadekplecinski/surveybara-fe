@@ -26,7 +26,6 @@ export class UpdateSurveyModalComponent {
   categories: Category[] = [];
   @Output() close = new EventEmitter<void>();
   @Input() survey: Survey | null = null;
-  @Input() readonlyMode = false;
 
   surveyForm: FormGroup;
   errorMessage: string | null = null;
@@ -110,10 +109,6 @@ export class UpdateSurveyModalComponent {
         })
       );
     });
-
-    if (this.readonlyMode) {
-      this.surveyForm.disable();
-    }
   }
 
   closeModal() {

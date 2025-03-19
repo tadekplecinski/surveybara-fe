@@ -11,6 +11,7 @@ import { AddSurveyModalComponent } from '../../components/add-survey-modal/add-s
 import { Survey, SurveyService } from '../../services/survey.service';
 import { UpdateSurveyModalComponent } from '../../components/update-survey-modal/update-survey-modal.component';
 import { InviteUserModalComponent } from '../../components/invite-user-modal/invite-user-modal.component';
+import { SurveyDetailsModalComponent } from '../../components/survey-details-modal/survey-details-modal.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -18,6 +19,7 @@ import { InviteUserModalComponent } from '../../components/invite-user-modal/inv
     AddSurveyModalComponent,
     UpdateSurveyModalComponent,
     InviteUserModalComponent,
+    SurveyDetailsModalComponent,
     MatTableModule,
     CommonModule,
     MatSortModule,
@@ -32,12 +34,12 @@ export class DashboardComponent {
   showCreateModal = false;
   showUpdateModal = false;
   showInviteModal = false;
+  showDetailsModal = false;
 
   private surveysSubscription: Subscription | null = null;
 
   @ViewChild(MatSort) sort!: MatSort;
   selectedSurvey: Survey | null = null;
-  readonlyMode = false;
 
   surveys = new MatTableDataSource<Survey>([]);
   displayedColumns: string[] = [
@@ -81,10 +83,9 @@ export class DashboardComponent {
     this.showCreateModal = true;
   }
 
-  openUpdateModal(survey: Survey, readonly = false) {
+  openUpdateModal(survey: Survey) {
     this.showUpdateModal = true;
     this.selectedSurvey = survey;
-    this.readonlyMode = readonly;
   }
 
   openInviteModal(survey: Survey) {
@@ -92,15 +93,17 @@ export class DashboardComponent {
     this.selectedSurvey = survey;
   }
 
-  openPreviewModal(survey: Survey) {
-    this.openUpdateModal(survey, true);
+  openDetailsModal(survey: Survey) {
+    this.showDetailsModal = true;
+    this.selectedSurvey = survey;
   }
 
-  // refactor!
+  // TODO: refactor!
   closeModal() {
     this.showCreateModal = false;
     this.showUpdateModal = false;
     this.showInviteModal = false;
+    this.showDetailsModal = false;
     this.selectedSurvey = null;
     this.loadSurveys();
   }

@@ -20,6 +20,13 @@ export interface Survey {
   categories: { id: number; name: string }[];
 }
 
+export interface SurveyDetails {
+  survey: Survey;
+  surveysCount: number;
+  questionsCount: number;
+  invitedUsersEmails: string[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -110,6 +117,44 @@ export class SurveyService {
 
           if (error.status === 400) {
             errorMessage = 'Invalid data. Please check your input.';
+          }
+
+          return throwError(() => new Error(errorMessage));
+        })
+      );
+  }
+
+  getSurveyDetails(id: number): Observable<SurveyDetails> {
+    const token = this.authService.getToken();
+
+    if (!token) {
+      return throwError(() => new Error('No authorization token found.'));
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+
+    return this.http
+      .get<{
+        success: boolean;
+        data: SurveyDetails;
+      }>(`${this.apiUrl}/admin/survey/${id}`, { headers })
+      .pipe(
+        map((response) => {
+          if (response.success) {
+            return response.data;
+          } else {
+            throw new Error('Failed to fetch survey details.');
+          }
+        }),
+        catchError((error) => {
+          console.error('Failed to fetch survey details:', error);
+          let errorMessage =
+            'Failed to fetch survey details. Please try again later.';
+
+          if (error.status === 404) {
+            errorMessage = 'Survey not found.';
           }
 
           return throwError(() => new Error(errorMessage));

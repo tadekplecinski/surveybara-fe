@@ -2,15 +2,17 @@
   (close)="closeModal()"
 ></app-add-survey-modal
 >} @if(showUpdateModal) {
-<app-update-survey-modal
-  [survey]="selectedSurvey"
-  [readonlyMode]="readonlyMode"
-  (close)="closeModal()"
->
+<app-update-survey-modal [survey]="selectedSurvey" (close)="closeModal()">
 </app-update-survey-modal>
 } @if(showInviteModal) {
 <app-invite-user-modal [survey]="selectedSurvey" (close)="closeModal()">
 </app-invite-user-modal>
+} @if(showDetailsModal) {
+<app-survey-details-modal
+  [surveyId]="selectedSurvey?.id"
+  (close)="closeModal()"
+>
+</app-survey-details-modal>
 }
 
 <div class="flex flex-col gap-2 items-center items-center justify-center p-6">
@@ -77,8 +79,8 @@
           >
             <mat-icon>content_copy</mat-icon> Invite
           </button>
-          <button mat-menu-item (click)="openPreviewModal(survey)">
-            <mat-icon>visibility</mat-icon> Preview
+          <button mat-menu-item (click)="openDetailsModal(survey)">
+            <mat-icon>visibility</mat-icon> Details
           </button>
         </mat-menu>
       </td>

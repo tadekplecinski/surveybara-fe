@@ -1,0 +1,86 @@
+@if (surveyDetails && surveyDetails.survey) {
+<div
+  class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-[1000]"
+>
+  <div
+    class="bg-white w-full max-w-md p-6 rounded-lg shadow-lg relative border border-gray-300"
+  >
+    <h2 class="text-xl font-semibold text-gray-800">Survey Details</h2>
+    <div class="space-y-3 mt-4">
+      <!-- Survey Title -->
+      <div>
+        <span class="block text-sm font-medium text-gray-700">Title:</span>
+        <p class="text-gray-900 font-medium">
+          {{ surveyDetails.survey.title }}
+        </p>
+      </div>
+
+      <!-- Survey Status -->
+      <div>
+        <span class="block text-sm font-medium text-gray-700">Status:</span>
+        <p
+          class="px-2 py-1 inline-block text-sm rounded-md"
+          [ngClass]="{
+            'bg-green-200 text-green-800':
+              surveyDetails.survey.status === 'published',
+            'bg-yellow-200 text-yellow-800':
+              surveyDetails.survey.status === 'draft'
+          }"
+        >
+          {{ surveyDetails.survey.status | titlecase }}
+        </p>
+      </div>
+
+      <!-- Created At / Updated At -->
+      <div>
+        <span class="block text-sm font-medium text-gray-700">Created At:</span>
+        <p class="text-gray-900">
+          {{ surveyDetails.survey.createdAt | date : "medium" }}
+        </p>
+      </div>
+
+      <div>
+        <span class="block text-sm font-medium text-gray-700"
+          >Last Updated:</span
+        >
+        <p class="text-gray-900">
+          {{ surveyDetails.survey.updatedAt | date : "medium" }}
+        </p>
+      </div>
+
+      <!-- Number of Questions -->
+      <div>
+        <span class="block text-sm font-medium text-gray-700"
+          >Number of questions:</span
+        >
+        <p class="text-gray-900">{{ surveyDetails.questionsCount }}</p>
+      </div>
+
+      @if (surveyDetails.survey.categories.length > 0) {
+      <span class="block text-sm font-medium text-gray-700">Categories:</span>
+      <p class="text-gray-900">
+        {{ categoryNames }}
+      </p>
+      } @if (surveyDetails.invitedUsersEmails.length > 0) {
+      <span class="block text-sm font-medium text-gray-700"
+        >Invited Users:</span
+      >
+      <p class="text-gray-900">
+        {{ invitedUsers }}
+      </p>
+      }
+    </div>
+
+    <!-- Close Button -->
+    <div class="flex justify-end gap-3 mt-4">
+      <button
+        type="button"
+        (click)="closeModal()"
+        class="px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+}
