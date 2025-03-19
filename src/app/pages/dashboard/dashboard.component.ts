@@ -11,12 +11,14 @@ import { AuthService } from '../../services/auth.service';
 import { AddSurveyModalComponent } from '../../components/add-survey-modal/add-survey-modal.component';
 import { Survey, SurveyService } from '../../services/survey.service';
 import { UpdateSurveyModalComponent } from '../../components/update-survey-modal/update-survey-modal.component';
+import { InviteUserModalComponent } from '../../components/invite-user-modal/invite-user-modal.component';
 
 @Component({
   selector: 'app-dashboard',
   imports: [
     AddSurveyModalComponent,
     UpdateSurveyModalComponent,
+    InviteUserModalComponent,
     MatTableModule,
     CommonModule,
     MatSortModule,
@@ -31,6 +33,7 @@ export class DashboardComponent {
   private authService = inject(AuthService);
   showCreateModal = false;
   showUpdateModal = false;
+  showInviteModal = false;
 
   userRole: string | null = null;
   private userRoleSubscription: Subscription | null = null;
@@ -94,21 +97,22 @@ export class DashboardComponent {
     this.selectedSurvey = survey;
   }
 
+  openInviteModal(survey: Survey) {
+    this.showInviteModal = true;
+    this.selectedSurvey = survey;
+  }
+
   // refactor!
   closeModal() {
     this.showCreateModal = false;
     this.showUpdateModal = false;
+    this.showInviteModal = false;
     this.selectedSurvey = null;
     this.loadSurveys();
   }
 
   get isAdmin(): boolean {
     return this.userRole === 'admin';
-  }
-
-  duplicateSurvey(survey: Survey) {
-    console.log('Duplicate survey:', survey);
-    // Implement the logic to duplicate the survey
   }
 
   deleteSurvey(survey: Survey) {

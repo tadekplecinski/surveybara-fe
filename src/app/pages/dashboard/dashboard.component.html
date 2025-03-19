@@ -2,9 +2,11 @@
   (close)="closeModal()"
 ></app-add-survey-modal
 >} @if(showUpdateModal) {
-
 <app-update-survey-modal [survey]="selectedSurvey" (close)="closeModal()">
 </app-update-survey-modal>
+} @if(showInviteModal) {
+<app-invite-user-modal [survey]="selectedSurvey" (close)="closeModal()">
+</app-invite-user-modal>
 }
 
 <div class="flex flex-col gap-2 items-center items-center justify-center p-6">
@@ -59,11 +61,19 @@
           <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #menu="matMenu">
-          <button mat-menu-item (click)="openUpdateModal(survey)">
+          <button
+            mat-menu-item
+            (click)="openUpdateModal(survey)"
+            [disabled]="survey.status === 'published'"
+          >
             <mat-icon>edit</mat-icon> Edit
           </button>
-          <button mat-menu-item (click)="duplicateSurvey(survey)">
-            <mat-icon>content_copy</mat-icon> Duplicate
+          <button
+            mat-menu-item
+            (click)="openInviteModal(survey)"
+            [disabled]="survey.status === 'draft'"
+          >
+            <mat-icon>content_copy</mat-icon> Invite
           </button>
           <button mat-menu-item (click)="deleteSurvey(survey)">
             <mat-icon>delete</mat-icon> Delete

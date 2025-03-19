@@ -1,0 +1,53 @@
+<div
+  class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-[1000]"
+>
+  <div
+    class="bg-white w-full max-w-md p-6 rounded-lg shadow-lg relative border border-gray-300"
+  >
+    <form [formGroup]="inviteForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <h2 class="text-xl font-semibold text-gray-800">Invite User</h2>
+
+      <div class="form-group">
+        <label for="email" class="block text-sm font-medium text-gray-700"
+          >Select User</label
+        >
+        <select
+          id="email"
+          formControlName="email"
+          class="mt-1 block w-full p-2 border rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+        >
+          <option value="" disabled selected>Select a user to invite</option>
+          @for (user of users; track user.id) {
+          <option [value]="user.email">
+            {{ user.userName }} ({{ user.email }})
+          </option>
+          } @empty {
+          <option>No users available</option>
+          }
+        </select>
+
+        @if (inviteForm.get('email')?.invalid &&
+        inviteForm.get('email')?.touched) {
+        <small class="text-red-500 text-sm">Please select a user</small>
+        }
+      </div>
+
+      <div class="flex justify-end gap-3 mt-4">
+        <button
+          type="submit"
+          [disabled]="inviteForm.invalid"
+          class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md disabled:opacity-50 hover:bg-green-700"
+        >
+          Invite User
+        </button>
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
