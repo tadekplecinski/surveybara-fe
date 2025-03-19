@@ -5,73 +5,73 @@
   <div
     class="bg-white w-full max-w-md p-6 rounded-lg shadow-lg relative border border-gray-300"
   >
-    <h2 class="text-xl font-semibold text-gray-800">Survey Details</h2>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl font-semibold text-gray-800">Survey Details</h2>
+      <p
+        class="px-2 py-1 text-sm rounded-md"
+        [ngClass]="{
+          'bg-green-200 text-green-800':
+            surveyDetails.survey.status === 'published',
+          'bg-yellow-200 text-yellow-800':
+            surveyDetails.survey.status === 'draft'
+        }"
+      >
+        {{ surveyDetails.survey.status | titlecase }}
+      </p>
+    </div>
+
     <div class="space-y-3 mt-4">
-      <!-- Survey Title -->
-      <div>
-        <span class="block text-sm font-medium text-gray-700">Title:</span>
-        <p class="text-gray-900 font-medium">
+      <div class="flex justify-between">
+        <span class="block text-m font-medium text-gray-900">Title:</span>
+        <p class="text-m font-medium text-gray-500">
           {{ surveyDetails.survey.title }}
         </p>
       </div>
 
-      <!-- Survey Status -->
-      <div>
-        <span class="block text-sm font-medium text-gray-700">Status:</span>
-        <p
-          class="px-2 py-1 inline-block text-sm rounded-md"
-          [ngClass]="{
-            'bg-green-200 text-green-800':
-              surveyDetails.survey.status === 'published',
-            'bg-yellow-200 text-yellow-800':
-              surveyDetails.survey.status === 'draft'
-          }"
-        >
-          {{ surveyDetails.survey.status | titlecase }}
-        </p>
-      </div>
-
-      <!-- Created At / Updated At -->
-      <div>
-        <span class="block text-sm font-medium text-gray-700">Created At:</span>
-        <p class="text-gray-900">
+      <div class="flex justify-between">
+        <span class="block text-m font-medium text-gray-900">Created At:</span>
+        <p class="text-m font-medium text-gray-500">
           {{ surveyDetails.survey.createdAt | date : "medium" }}
         </p>
       </div>
 
-      <div>
-        <span class="block text-sm font-medium text-gray-700"
+      <div class="flex justify-between">
+        <span class="block text-m font-medium text-gray-900"
           >Last Updated:</span
         >
-        <p class="text-gray-900">
+        <p class="text-m font-medium text-gray-500">
           {{ surveyDetails.survey.updatedAt | date : "medium" }}
         </p>
       </div>
 
-      <!-- Number of Questions -->
-      <div>
-        <span class="block text-sm font-medium text-gray-700"
+      <div class="flex justify-between">
+        <span class="block text-m font-medium text-gray-900"
           >Number of questions:</span
         >
-        <p class="text-gray-900">{{ surveyDetails.questionsCount }}</p>
+        <p class="text-m font-medium text-gray-500">
+          {{ surveyDetails.questionsCount }}
+        </p>
       </div>
 
       @if (surveyDetails.survey.categories.length > 0) {
-      <span class="block text-sm font-medium text-gray-700">Categories:</span>
-      <p class="text-gray-900">
-        {{ categoryNames }}
-      </p>
+      <div class="flex justify-between">
+        <span class="block text-m font-medium text-gray-900">Categories:</span>
+        <p class="text-m font-medium text-gray-500">
+          {{ categoryNames }}
+        </p>
+      </div>
       } @if (surveyDetails.invitedUsersEmails.length > 0) {
-      <span class="block text-sm font-medium text-gray-700"
-        >Invited Users:</span
-      >
-      <p class="text-gray-900">
-        {{ invitedUsers }}
-      </p>
+      <div class="flex justify-between">
+        <span class="block text-m font-medium text-gray-900"
+          >Invited Users:</span
+        >
+        <p class="text-m font-medium text-gray-500">
+          {{ invitedUsers }}
+        </p>
+      </div>
       }
     </div>
 
-    <!-- Close Button -->
     <div class="flex justify-end gap-3 mt-4">
       <button
         type="button"
