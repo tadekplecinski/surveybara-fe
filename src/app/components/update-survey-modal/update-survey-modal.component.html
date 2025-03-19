@@ -92,6 +92,13 @@
         </select>
       </div>
 
+      @if (surveyForm.get('status')?.errors?.['noQuestions'] &&
+      surveyForm.get('status')?.touched) {
+      <small class="text-red-500 text-sm">
+        A survey must have at least one question to be published.
+      </small>
+      }
+
       <div class="flex justify-end gap-3 mt-4">
         @if(!readonlyMode) {
         <button

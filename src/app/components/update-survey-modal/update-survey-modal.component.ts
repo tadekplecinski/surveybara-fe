@@ -1,9 +1,11 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {
+  AbstractControl,
   FormArray,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -34,8 +36,23 @@ export class UpdateSurveyModalComponent {
       title: ['', [Validators.required, Validators.minLength(3)]],
       categoryIds: [[]],
       questions: this.fb.array([]),
-      status: ['draft', Validators.required],
+      status: ['draft', [Validators.required, this.statusValidator.bind(this)]],
     });
+  }
+
+  statusValidator(control: AbstractControl): ValidationErrors | null {
+    const questions = this.surveyForm?.get('questions') as FormArray;
+
+    if (
+      control.value === 'published' &&
+      (!questions || questions.length === 0)
+    ) {
+      return {
+        noQuestions:
+          'A survey must have at least one question to be published.',
+      };
+    }
+    return null;
   }
 
   ngOnInit(): void {
@@ -43,6 +60,10 @@ export class UpdateSurveyModalComponent {
     if (this.survey) {
       this.populateForm(this.survey);
     }
+
+    this.surveyForm.get('questions')?.valueChanges.subscribe(() => {
+      this.surveyForm.get('status')?.updateValueAndValidity();
+    });
   }
 
   loadCategories(): void {
