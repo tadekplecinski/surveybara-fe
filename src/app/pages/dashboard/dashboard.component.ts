@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
@@ -7,7 +7,6 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
-import { AuthService } from '../../services/auth.service';
 import { AddSurveyModalComponent } from '../../components/add-survey-modal/add-survey-modal.component';
 import { Survey, SurveyService } from '../../services/survey.service';
 import { UpdateSurveyModalComponent } from '../../components/update-survey-modal/update-survey-modal.component';
@@ -30,13 +29,10 @@ import { InviteUserModalComponent } from '../../components/invite-user-modal/inv
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent {
-  private authService = inject(AuthService);
   showCreateModal = false;
   showUpdateModal = false;
   showInviteModal = false;
 
-  userRole: string | null = null;
-  private userRoleSubscription: Subscription | null = null;
   private surveysSubscription: Subscription | null = null;
 
   @ViewChild(MatSort) sort!: MatSort;
@@ -62,10 +58,6 @@ export class DashboardComponent {
 
   ngOnInit(): void {
     this.loadSurveys();
-    // TODO: remove???, dashboards will be separated by role anyway
-    this.userRoleSubscription = this.authService.userRole$.subscribe((role) => {
-      this.userRole = role;
-    });
   }
 
   loadSurveys() {
@@ -80,10 +72,6 @@ export class DashboardComponent {
   }
 
   ngOnDestroy(): void {
-    if (this.userRoleSubscription) {
-      this.userRoleSubscription.unsubscribe();
-    }
-
     if (this.surveysSubscription) {
       this.surveysSubscription.unsubscribe();
     }
@@ -115,9 +103,5 @@ export class DashboardComponent {
     this.showInviteModal = false;
     this.selectedSurvey = null;
     this.loadSurveys();
-  }
-
-  get isAdmin(): boolean {
-    return this.userRole === 'admin';
   }
 }

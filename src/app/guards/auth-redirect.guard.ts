@@ -1,20 +1,17 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class AuthRedirectGuard implements CanActivate {
-  constructor(private router: Router) {}
+import { AuthService } from '../services/auth.service';
 
-  canActivate(): boolean {
-    const token = localStorage.getItem('auth_token');
+export const redirectIfAuthenticatedGuard: CanActivateFn = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
 
-    if (token) {
-      this.router.navigate(['/dashboard']);
-      return false;
-    }
-
-    return true;
+  if (authService.isAuthenticated()) {
+    const userRole = authService.getStoredRole();
+    router.navigate([userRole === 'admin' ? '/dashboard' : '/user-dashboard']);
+    return false;
   }
-}
+
+  return true;
+};
