@@ -27,6 +27,12 @@ export interface SurveyDetails {
   invitedUsersEmails: string[];
 }
 
+export interface SurveyFilters {
+  searchTitle?: string;
+  status?: string;
+  categoryId?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -88,7 +94,7 @@ export class SurveyService {
     );
   }
 
-  getSurveys(search?: string): Observable<Survey[]> {
+  getSurveys(filters: SurveyFilters): Observable<Survey[]> {
     const token = this.authService.getToken();
     if (!token) {
       return throwError(() => new Error('No authorization token found.'));
@@ -98,10 +104,12 @@ export class SurveyService {
       Authorization: `Bearer ${token}`,
     });
 
+    const { searchTitle, status, categoryId } = filters;
     let params = new HttpParams();
-    if (search) {
-      params = params.set('title', search);
-    }
+
+    if (searchTitle) params = params.set('title', searchTitle);
+    if (status) params = params.set('status', status);
+    if (categoryId) params = params.set('categoryId', categoryId);
 
     return this.http
       .get<{ success: boolean; data: Survey[] }>(
