@@ -21,21 +21,21 @@
     </div>
 
     <div class="space-y-3 mt-4">
-      <div class="flex justify-between">
+      <div class="flex justify-between gap-5">
         <span class="block text-m font-medium text-gray-900">Title:</span>
         <p class="text-m font-medium text-gray-500">
           {{ surveyDetails.survey.title }}
         </p>
       </div>
 
-      <div class="flex justify-between">
+      <div class="flex justify-between gap-5">
         <span class="block text-m font-medium text-gray-900">Created At:</span>
         <p class="text-m font-medium text-gray-500">
           {{ surveyDetails.survey.createdAt | date : "medium" }}
         </p>
       </div>
 
-      <div class="flex justify-between">
+      <div class="flex justify-between gap-5">
         <span class="block text-m font-medium text-gray-900"
           >Last Updated:</span
         >
@@ -44,7 +44,7 @@
         </p>
       </div>
 
-      <div class="flex justify-between">
+      <div class="flex justify-between gap-5">
         <span class="block text-m font-medium text-gray-900"
           >Number of questions:</span
         >
@@ -54,17 +54,15 @@
       </div>
 
       @if (surveyDetails.survey.categories.length > 0) {
-      <div class="flex justify-between">
+      <div class="flex justify-between gap-5">
         <span class="block text-m font-medium text-gray-900">Categories:</span>
         <p class="text-m font-medium text-gray-500">
           {{ categoryNames }}
         </p>
       </div>
       } @if (surveyDetails.invitedUsersEmails.length > 0) {
-      <div class="flex justify-between">
-        <span class="block text-m font-medium text-gray-900"
-          >Invited Users:</span
-        >
+      <div class="flex justify-between gap-5">
+        <span class="block text-m font-medium text-gray-900">Invited:</span>
         <p class="text-m font-medium text-gray-500">
           {{ invitedUsers }}
         </p>

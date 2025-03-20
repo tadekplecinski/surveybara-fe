@@ -28,8 +28,7 @@ import { RespondModalComponent } from '../../components/respond-modal/respond-mo
   styleUrls: ['./user-dashboard.component.scss'],
 })
 export class UserDashboardComponent {
-  showRespondModal = false;
-  showPreviewModal = false;
+  showModal = false;
   readonlyMode = false;
   selectedUserSurvey: UserSurveyParsed | null = null;
   surveys = new MatTableDataSource<UserSurveyParsed>([]);
@@ -77,7 +76,7 @@ export class UserDashboardComponent {
   }
 
   openRespondModal(survey: UserSurveyParsed, readonly = false) {
-    this.showRespondModal = true;
+    this.showModal = true;
     this.selectedUserSurvey = survey;
     this.readonlyMode = readonly;
   }
@@ -86,13 +85,8 @@ export class UserDashboardComponent {
     this.openRespondModal(survey, true);
   }
 
-  submitUserSurvey(survey: UserSurveyParsed) {
-    // logic to submit the survey
-  }
-
   closeModal() {
-    this.showRespondModal = false;
-    this.showPreviewModal = false;
+    this.showModal = false;
     this.loadSurveys();
   }
 }

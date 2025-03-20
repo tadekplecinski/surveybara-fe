@@ -1,4 +1,4 @@
-@if(showRespondModal) {
+@if(showModal) {
 <app-respond-modal
   [survey]="selectedUserSurvey"
   [readonlyMode]="readonlyMode"
@@ -51,13 +51,6 @@
           <button mat-menu-item (click)="openPreviewModal(survey)">
             <mat-icon>visibility</mat-icon> Preview
           </button>
-          <!-- <button
-            mat-menu-item
-            (click)="submitUserSurvey(survey)"
-            [disabled]="survey.status === 'submitted'"
-          >
-            <mat-icon>check_circle</mat-icon> Submit
-          </button> -->
         </mat-menu>
       </td>
     </ng-container>

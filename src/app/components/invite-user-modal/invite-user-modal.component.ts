@@ -40,7 +40,16 @@ export class InviteUserModalComponent {
   loadNonAdminUsers(): void {
     this.userService.getNonAdminUsers().subscribe({
       next: (users) => {
-        this.users = users;
+        if (!this.survey || !this.survey.id) {
+          return;
+        }
+
+        const survey = this.survey;
+        // filter out those users who are already invited to this survey
+        this.users = users.filter((user) => {
+          const userSurveyIds = user.Surveys.map((s) => s.id);
+          return !userSurveyIds.includes(survey.id);
+        });
       },
       error: (err) => {
         this.errorMessage = err.message;

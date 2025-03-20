@@ -1,13 +1,13 @@
-@if(showCreateModal) {<app-add-survey-modal
+@if(modal === 'create') {<app-add-survey-modal
   (close)="closeModal()"
 ></app-add-survey-modal
->} @if(showUpdateModal) {
+>} @if(modal === 'update') {
 <app-update-survey-modal [survey]="selectedSurvey" (close)="closeModal()">
 </app-update-survey-modal>
-} @if(showInviteModal) {
+} @if(modal === 'invite') {
 <app-invite-user-modal [survey]="selectedSurvey" (close)="closeModal()">
 </app-invite-user-modal>
-} @if(showDetailsModal) {
+} @if(modal === 'details') {
 <app-survey-details-modal
   [surveyId]="selectedSurvey?.id"
   (close)="closeModal()"

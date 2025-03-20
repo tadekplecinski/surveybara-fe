@@ -31,10 +31,7 @@ import { SurveyDetailsModalComponent } from '../../components/survey-details-mod
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent {
-  showCreateModal = false;
-  showUpdateModal = false;
-  showInviteModal = false;
-  showDetailsModal = false;
+  modal: 'create' | 'update' | 'invite' | 'details' | null = null;
 
   private surveysSubscription: Subscription | null = null;
 
@@ -80,30 +77,27 @@ export class DashboardComponent {
   }
 
   openCreateModal() {
-    this.showCreateModal = true;
+    this.modal = 'create';
   }
 
   openUpdateModal(survey: Survey) {
-    this.showUpdateModal = true;
+    this.modal = 'update';
     this.selectedSurvey = survey;
   }
 
   openInviteModal(survey: Survey) {
-    this.showInviteModal = true;
+    this.modal = 'invite';
     this.selectedSurvey = survey;
   }
 
   openDetailsModal(survey: Survey) {
-    this.showDetailsModal = true;
+    this.modal = 'details';
     this.selectedSurvey = survey;
   }
 
   // TODO: refactor!
   closeModal() {
-    this.showCreateModal = false;
-    this.showUpdateModal = false;
-    this.showInviteModal = false;
-    this.showDetailsModal = false;
+    this.modal = null;
     this.selectedSurvey = null;
     this.loadSurveys();
   }
