@@ -42,7 +42,7 @@ export class CategoryService {
       .pipe(
         map((response) => {
           if (response.success) {
-            return response.data; // Extracting data here
+            return response.data;
           } else {
             throw new Error('Failed to fetch categories.');
           }

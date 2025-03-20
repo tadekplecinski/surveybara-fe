@@ -2,13 +2,14 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnDestroy,
   OnInit,
   Output,
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { Subject, throwError } from 'rxjs';
 
 import { SurveyDetails, SurveyService } from '../../services/survey.service';
 
@@ -19,8 +20,9 @@ import { SurveyDetails, SurveyService } from '../../services/survey.service';
   templateUrl: './survey-details-modal.component.html',
   styleUrls: ['./survey-details-modal.component.scss'],
 })
-export class SurveyDetailsModalComponent implements OnInit {
+export class SurveyDetailsModalComponent implements OnInit, OnDestroy {
   private surveyService = inject(SurveyService);
+  private destroy$ = new Subject<void>();
 
   @Input() surveyId!: number | undefined;
   @Output() close = new EventEmitter<void>();
@@ -37,6 +39,7 @@ export class SurveyDetailsModalComponent implements OnInit {
     this.surveyService
       .getSurveyDetails(this.surveyId)
       .pipe(
+        takeUntil(this.destroy$),
         catchError((error) => {
           this.errorMessage = error.message;
           return throwError(() => error);
@@ -57,15 +60,20 @@ export class SurveyDetailsModalComponent implements OnInit {
       this.surveyDetails?.survey.categories
         .map((category) => category.name)
         .join(', ') || ''
-    ); // Ensure it doesn't return null or undefined
+    );
   }
 
   get invitedUsers(): string {
-    return this.surveyDetails?.invitedUsersEmails.join(', ') || ''; // Ensure it doesn't return null or undefined
+    return this.surveyDetails?.invitedUsersEmails.join(', ') || '';
   }
 
   closeModal(): void {
     this.close.emit();
     this.surveyDetails = null;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

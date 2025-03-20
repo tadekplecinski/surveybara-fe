@@ -10,8 +10,7 @@
         type="text"
         class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400"
       />
-      @if (registerForm.get('userName')?.invalid &&
-      registerForm.get('userName')?.touched) {
+      @if (userName?.invalid && userName?.touched) {
       <small class="text-red-500 text-sm"
         >Username must be at least 3 characters.</small
       >
@@ -26,8 +25,7 @@
         type="email"
         class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400"
       />
-      @if ( registerForm.get('email')?.invalid &&
-      registerForm.get('email')?.touched) {
+      @if ( email?.invalid && email?.touched) {
       <small class="text-red-500 text-sm">Enter a valid email.</small>
       }
     </div>
@@ -41,8 +39,7 @@
           type="password"
           class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400"
         />
-        @if ( registerForm.get('passwords.password')?.invalid &&
-        registerForm.get('passwords.password')?.touched) {
+        @if ( password?.invalid && password?.touched) {
         <small class="text-red-500 text-sm"
           >Password must be at least 6 characters.</small
         >
@@ -59,8 +56,7 @@
           type="password"
           class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400"
         />
-        @if ( registerForm.get('passwords.confirmPassword')?.invalid &&
-        registerForm.get('passwords.confirmPassword')?.touched) {
+        @if ( confirmPassword?.invalid && confirmPassword?.touched) {
         <small class="text-red-500 text-sm"
           >Confirm password is required.</small
         >

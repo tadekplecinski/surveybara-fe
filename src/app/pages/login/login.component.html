@@ -10,8 +10,7 @@
         type="email"
         class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400"
       />
-      @if ( loginForm.get('email')?.invalid && loginForm.get('email')?.touched)
-      {
+      @if ( email?.invalid && email?.touched) {
       <small class="text-red-500 text-sm">Enter a valid email.</small>
       }
     </div>
@@ -24,8 +23,7 @@
         type="password"
         class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400"
       />
-      @if ( loginForm.get('passwords.password')?.invalid &&
-      loginForm.get('passwords.password')?.touched) {
+      @if ( password?.invalid && password?.touched) {
       <small class="text-red-500 text-sm"
         >Password must be at least 6 characters.</small
       >

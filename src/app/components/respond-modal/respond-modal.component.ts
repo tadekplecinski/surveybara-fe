@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  inject,
+} from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -7,6 +15,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Subject, takeUntil } from 'rxjs';
+
 import {
   UserSurveyParsed,
   UserSurveyService,
@@ -17,22 +27,16 @@ import {
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './respond-modal.component.html',
 })
-export class RespondModalComponent {
+export class RespondModalComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private userSurveyService = inject(UserSurveyService);
+  private destroy$ = new Subject<void>();
 
   @Output() close = new EventEmitter<void>();
   @Input() survey: UserSurveyParsed | null = null;
 
-  surveyForm: FormGroup;
+  surveyForm!: FormGroup;
   errorMessage: string | null = null;
-
-  constructor() {
-    this.surveyForm = this.fb.group({
-      answers: this.fb.array([]),
-      status: ['draft', Validators.required],
-    });
-  }
 
   get submitBtnText() {
     return this.surveyForm.get('status')?.value === 'draft'
@@ -47,6 +51,11 @@ export class RespondModalComponent {
   }
 
   ngOnInit(): void {
+    this.surveyForm = this.fb.group({
+      answers: this.fb.array([]),
+      status: ['draft', Validators.required],
+    });
+
     if (this.survey) {
       this.populateForm(this.survey);
     }
@@ -80,10 +89,11 @@ export class RespondModalComponent {
   }
 
   onSubmit() {
-    if (this.surveyForm.invalid) return;
+    if (this.surveyForm.invalid || !this.survey) return;
 
     this.userSurveyService
-      .updateUserSurvey(this.survey!.id, this.surveyForm.value)
+      .updateUserSurvey(this.survey.id, this.surveyForm.value)
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           this.closeModal();
@@ -92,5 +102,10 @@ export class RespondModalComponent {
           console.error('Error updating survey:', error);
         },
       });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

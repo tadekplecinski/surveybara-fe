@@ -1,4 +1,12 @@
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -9,6 +17,7 @@ import { CommonModule } from '@angular/common';
 
 import { Survey } from '../../services/survey.service';
 import { UserService, User } from '../../services/user.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-invite-user-modal',
@@ -16,46 +25,48 @@ import { UserService, User } from '../../services/user.service';
   templateUrl: './invite-user-modal.component.html',
   styleUrls: ['./invite-user-modal.component.scss'],
 })
-export class InviteUserModalComponent {
+export class InviteUserModalComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private userService = inject(UserService);
 
   users: User[] = [];
   @Input() survey: Survey | null = null;
   @Output() close = new EventEmitter<void>();
+  private destroy$ = new Subject<void>();
 
-  inviteForm: FormGroup;
+  inviteForm!: FormGroup;
   errorMessage: string | null = null;
 
-  constructor() {
+  ngOnInit(): void {
     this.inviteForm = this.fb.group({
       email: ['', Validators.required],
     });
-  }
 
-  ngOnInit(): void {
     this.loadNonAdminUsers();
   }
 
   loadNonAdminUsers(): void {
-    this.userService.getNonAdminUsers().subscribe({
-      next: (users) => {
-        if (!this.survey || !this.survey.id) {
-          return;
-        }
+    this.userService
+      .getNonAdminUsers()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (users) => {
+          if (!this.survey || !this.survey.id) {
+            return;
+          }
 
-        const survey = this.survey;
-        // filter out those users who are already invited to this survey
-        this.users = users.filter((user) => {
-          const userSurveyIds = user.Surveys.map((s) => s.id);
-          return !userSurveyIds.includes(survey.id);
-        });
-      },
-      error: (err) => {
-        this.errorMessage = err.message;
-        console.error('Failed to load users:', err);
-      },
-    });
+          const survey = this.survey;
+          // filter out those users who are already invited to this survey
+          this.users = users.filter((user) => {
+            const userSurveyIds = user.Surveys.map((s) => s.id);
+            return !userSurveyIds.includes(survey.id);
+          });
+        },
+        error: (err) => {
+          this.errorMessage = err.message;
+          console.error('Failed to load users:', err);
+        },
+      });
   }
 
   closeModal() {
@@ -83,5 +94,10 @@ export class InviteUserModalComponent {
     });
 
     this.closeModal();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

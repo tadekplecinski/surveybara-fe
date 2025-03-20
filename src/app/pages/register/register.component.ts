@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -7,6 +7,7 @@ import {
   AbstractControl,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Subject, takeUntil } from 'rxjs';
 
 import { AuthService } from '../../services/auth.service';
 
@@ -27,11 +28,15 @@ const equalPasswords = (control: AbstractControl) => {
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
-export class RegisterComponent {
-  registerForm: FormGroup;
+export class RegisterComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
+  registerForm!: FormGroup;
   errorMessage: string = '';
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {
+  constructor(private fb: FormBuilder, private authService: AuthService) {}
+
+  ngOnInit(): void {
     this.registerForm = this.fb.group({
       userName: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
@@ -52,6 +57,7 @@ export class RegisterComponent {
 
     this.authService
       .register({ userName, email, password: passwords.password })
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           console.log('User registered successfully');
@@ -61,5 +67,26 @@ export class RegisterComponent {
           this.errorMessage = 'Registration failed. Please try again.';
         },
       });
+  }
+
+  get userName() {
+    return this.registerForm.get('userName');
+  }
+
+  get email() {
+    return this.registerForm.get('email');
+  }
+
+  get password() {
+    return this.registerForm.get('passwords.password');
+  }
+
+  get confirmPassword() {
+    return this.registerForm.get('passwords.confirmPassword');
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

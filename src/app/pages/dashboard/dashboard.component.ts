@@ -1,5 +1,5 @@
-import { Component, ViewChild } from '@angular/core';
-import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -43,11 +43,11 @@ import { Category, CategoryService } from '../../services/category.service';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
+
   filterForm!: FormGroup;
   modal: 'create' | 'update' | 'invite' | 'details' | null = null;
-
-  private surveysSubscription: Subscription | null = null;
 
   @ViewChild(MatSort) sort!: MatSort;
   selectedSurvey: Survey | null = null;
@@ -82,7 +82,7 @@ export class DashboardComponent {
     });
 
     this.filterForm.valueChanges
-      .pipe(debounceTime(400), distinctUntilChanged())
+      .pipe(debounceTime(400), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((filters) => {
         this.loadSurveys(filters);
       });
@@ -92,14 +92,17 @@ export class DashboardComponent {
   }
 
   loadCategories(): void {
-    this.categoryService.fetchCategories().subscribe({
-      next: (categories) => {
-        this.categories = categories;
-      },
-      error: (err) => {
-        console.error('Failed to load categories:', err);
-      },
-    });
+    this.categoryService
+      .fetchCategories()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (categories) => {
+          this.categories = categories;
+        },
+        error: (err) => {
+          console.error('Failed to load categories:', err);
+        },
+      });
   }
 
   clearSearch() {
@@ -107,8 +110,9 @@ export class DashboardComponent {
   }
 
   loadSurveys(filters: SurveyFilters) {
-    this.surveysSubscription = this.surveyService
+    this.surveyService
       .getSurveys(filters)
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => {
           this.surveys.data = data;
@@ -119,34 +123,19 @@ export class DashboardComponent {
       });
   }
 
-  ngOnDestroy(): void {
-    if (this.surveysSubscription) {
-      this.surveysSubscription.unsubscribe();
-    }
-  }
-
-  openCreateModal() {
-    this.modal = 'create';
-  }
-
-  openUpdateModal(survey: Survey) {
-    this.modal = 'update';
-    this.selectedSurvey = survey;
-  }
-
-  openInviteModal(survey: Survey) {
-    this.modal = 'invite';
-    this.selectedSurvey = survey;
-  }
-
-  openDetailsModal(survey: Survey) {
-    this.modal = 'details';
-    this.selectedSurvey = survey;
+  openModal(type: 'create' | 'update' | 'invite' | 'details', survey?: Survey) {
+    this.modal = type;
+    this.selectedSurvey = survey ?? null;
   }
 
   closeModal() {
     this.modal = null;
     this.selectedSurvey = null;
     this.loadSurveys(this.filterForm.value);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

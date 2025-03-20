@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  inject,
+} from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -9,6 +17,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Subject, takeUntil } from 'rxjs';
+
 import { Survey, SurveyService } from '../../services/survey.service';
 import { Category, CategoryService } from '../../services/category.service';
 
@@ -18,25 +28,53 @@ import { Category, CategoryService } from '../../services/category.service';
   templateUrl: './update-survey-modal.component.html',
   styleUrls: ['./update-survey-modal.component.scss'],
 })
-export class UpdateSurveyModalComponent {
+export class UpdateSurveyModalComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private surveyService = inject(SurveyService);
   private categoryService = inject(CategoryService);
+  private destroy$ = new Subject<void>();
 
   categories: Category[] = [];
   @Output() close = new EventEmitter<void>();
   @Input() survey: Survey | null = null;
 
-  surveyForm: FormGroup;
+  surveyForm!: FormGroup;
   errorMessage: string | null = null;
 
-  constructor() {
+  ngOnInit(): void {
+    this.createForm();
+    this.loadCategories();
+    if (this.survey) {
+      this.populateForm(this.survey);
+    }
+
+    this.surveyForm.get('questions')?.valueChanges.subscribe(() => {
+      this.surveyForm.get('status')?.updateValueAndValidity();
+    });
+  }
+
+  private createForm(): void {
     this.surveyForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       categoryIds: [[]],
       questions: this.fb.array([]),
       status: ['draft', [Validators.required, this.statusValidator.bind(this)]],
     });
+  }
+
+  loadCategories(): void {
+    this.categoryService
+      .fetchCategories()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (categories) => {
+          this.categories = categories;
+        },
+        error: (err) => {
+          this.errorMessage = err.message;
+          console.error('Failed to load categories:', err);
+        },
+      });
   }
 
   statusValidator(control: AbstractControl): ValidationErrors | null {
@@ -52,29 +90,6 @@ export class UpdateSurveyModalComponent {
       };
     }
     return null;
-  }
-
-  ngOnInit(): void {
-    this.loadCategories();
-    if (this.survey) {
-      this.populateForm(this.survey);
-    }
-
-    this.surveyForm.get('questions')?.valueChanges.subscribe(() => {
-      this.surveyForm.get('status')?.updateValueAndValidity();
-    });
-  }
-
-  loadCategories(): void {
-    this.categoryService.fetchCategories().subscribe({
-      next: (categories) => {
-        this.categories = categories;
-      },
-      error: (err) => {
-        this.errorMessage = err.message;
-        console.error('Failed to load categories:', err);
-      },
-    });
   }
 
   get questions(): FormArray {
@@ -94,7 +109,7 @@ export class UpdateSurveyModalComponent {
     this.questions.removeAt(index);
   }
 
-  populateForm(survey: Survey): void {
+  private populateForm(survey: Survey): void {
     this.surveyForm.patchValue({
       title: survey.title,
       categoryIds: survey.categories.map((category) => category.id),
@@ -127,14 +142,28 @@ export class UpdateSurveyModalComponent {
       })),
     };
 
-    this.surveyService.updateSurvey(this.survey!.id, updatedSurvey).subscribe({
-      next: () => {
-        this.closeModal();
-      },
-      error: (err) => {
-        this.errorMessage = err.message;
-        console.error('Survey update error:', err);
-      },
-    });
+    this.surveyService
+      .updateSurvey(this.survey!.id, updatedSurvey)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.closeModal();
+        },
+        error: (err) => {
+          this.errorMessage = err.message;
+          console.error('Survey update error:', err);
+        },
+      });
+  }
+
+  get submitBtnText() {
+    return this.surveyForm.get('status')?.value === 'draft'
+      ? 'Save Draft'
+      : 'Publish';
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

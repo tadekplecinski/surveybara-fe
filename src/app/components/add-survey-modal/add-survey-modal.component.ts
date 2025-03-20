@@ -1,4 +1,11 @@
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -10,6 +17,8 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
+
 import { SurveyService } from '../../services/survey.service';
 import { Category, CategoryService } from '../../services/category.service';
 
@@ -19,7 +28,7 @@ import { Category, CategoryService } from '../../services/category.service';
   templateUrl: './add-survey-modal.component.html',
   styleUrls: ['./add-survey-modal.component.scss'],
 })
-export class AddSurveyModalComponent {
+export class AddSurveyModalComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private surveyService = inject(SurveyService);
   private categoryService = inject(CategoryService);
@@ -28,39 +37,43 @@ export class AddSurveyModalComponent {
   categories: Category[] = [];
   @Output() close = new EventEmitter<void>();
 
-  surveyForm: FormGroup;
+  surveyForm!: FormGroup;
   errorMessage: string | null = null;
+  private questionsValueChangesSubscription?: Subscription | null = null;
 
-  constructor() {
+  ngOnInit(): void {
     this.surveyForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
-      categoryIds: [[]],
+      categoryIds: [],
       questions: this.fb.array([]),
       status: ['draft', [Validators.required, this.statusValidator.bind(this)]],
     });
+
+    this.loadCategories();
+
+    this.questionsValueChangesSubscription = this.surveyForm
+      .get('questions')
+      ?.valueChanges.subscribe(() => {
+        this.surveyForm.get('status')?.updateValueAndValidity();
+      });
+  }
+
+  ngOnDestroy(): void {
+    if (this.questionsValueChangesSubscription) {
+      this.questionsValueChangesSubscription.unsubscribe();
+    }
   }
 
   statusValidator(control: AbstractControl): ValidationErrors | null {
     const questions = this.surveyForm?.get('questions') as FormArray;
 
-    if (
-      control.value === 'published' &&
-      (!questions || questions.length === 0)
-    ) {
+    if (control.value === 'published' && questions.length === 0) {
       return {
         noQuestions:
           'A survey must have at least one question to be published.',
       };
     }
     return null;
-  }
-
-  ngOnInit(): void {
-    this.loadCategories();
-
-    this.surveyForm.get('questions')?.valueChanges.subscribe(() => {
-      this.surveyForm.get('status')?.updateValueAndValidity();
-    });
   }
 
   loadCategories(): void {

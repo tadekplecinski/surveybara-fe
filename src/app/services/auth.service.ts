@@ -23,9 +23,9 @@ interface AuthResponse {
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/v1';
-  private tokenKey = 'auth_token';
-  private roleKey = 'user_role';
+  private readonly apiUrl = 'http://localhost:8080/v1';
+  private readonly tokenKey = 'auth_token';
+  private readonly roleKey = 'user_role';
 
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(
     this.hasToken()
@@ -37,25 +37,10 @@ export class AuthService {
   );
   userRole$ = this.userRoleSubject.asObservable();
 
-  constructor(private http: HttpClient, private router: Router) {
-    this.loadAuthState();
-  }
+  constructor(private http: HttpClient, private router: Router) {}
 
   private hasToken(): boolean {
-    return !!localStorage.getItem('token');
-  }
-
-  private loadAuthState(): void {
-    const token = this.getToken();
-    const role = this.getStoredRole();
-
-    if (token) {
-      this.isAuthenticatedSubject.next(true);
-    }
-
-    if (role) {
-      this.userRoleSubject.next(role);
-    }
+    return !!this.getToken();
   }
 
   register(payload: RegisterPayload): Observable<AuthResponse> {

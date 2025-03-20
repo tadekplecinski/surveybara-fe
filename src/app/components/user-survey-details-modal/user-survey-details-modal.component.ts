@@ -27,11 +27,10 @@ export class UserSurveyDetailsModalComponent implements OnChanges {
   @Output() close = new EventEmitter<void>();
 
   errorMessage: string | null = null;
-
   questionAnswerPairs: QuestionWithAnswer[] = [];
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['surveyDetails'] && this.surveyDetails) {
+    if (changes['surveyDetails']?.currentValue) {
       this.prepareData();
     }
   }

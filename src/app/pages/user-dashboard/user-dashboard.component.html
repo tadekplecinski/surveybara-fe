@@ -1,7 +1,7 @@
 @if(modal === 'respond') {
 <app-respond-modal [survey]="selectedUserSurvey" (close)="closeModal()">
 </app-respond-modal>
-} @if(modal === 'preview') {
+} @if(modal === 'details') {
 <app-survey-details-modal
   [surveyDetails]="selectedUserSurvey"
   (close)="closeModal()"
@@ -44,13 +44,13 @@
         <mat-menu #menu="matMenu">
           <button
             mat-menu-item
-            (click)="openRespondModal(survey)"
+            (click)="openModal('respond', survey)"
             [disabled]="survey.status === 'submitted'"
           >
             <mat-icon>comment</mat-icon> Respond
           </button>
-          <button mat-menu-item (click)="openPreviewModal(survey)">
-            <mat-icon>visibility</mat-icon> Preview
+          <button mat-menu-item (click)="openModal('details', survey)">
+            <mat-icon>visibility</mat-icon> Details
           </button>
         </mat-menu>
       </td>

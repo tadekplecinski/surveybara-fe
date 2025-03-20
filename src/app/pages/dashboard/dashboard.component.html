@@ -56,7 +56,7 @@
     </form>
 
     <button
-      (click)="openCreateModal()"
+      (click)="openModal('create')"
       class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
     >
       Add Survey
@@ -107,19 +107,19 @@
         <mat-menu #menu="matMenu">
           <button
             mat-menu-item
-            (click)="openUpdateModal(survey)"
+            (click)="openModal('update', survey)"
             [disabled]="survey.status === 'published'"
           >
             <mat-icon>edit</mat-icon> Edit
           </button>
           <button
             mat-menu-item
-            (click)="openInviteModal(survey)"
+            (click)="openModal('invite', survey)"
             [disabled]="survey.status === 'draft'"
           >
             <mat-icon>content_copy</mat-icon> Invite
           </button>
-          <button mat-menu-item (click)="openDetailsModal(survey)">
+          <button mat-menu-item (click)="openModal('details', survey)">
             <mat-icon>visibility</mat-icon> Details
           </button>
         </mat-menu>
