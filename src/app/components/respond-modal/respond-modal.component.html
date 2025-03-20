@@ -54,10 +54,10 @@
       <div class="flex justify-end gap-3 mt-4">
         <button
           type="submit"
-          [disabled]="surveyForm.invalid || readonlyMode"
+          [disabled]="surveyForm.invalid"
           class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md disabled:opacity-50 hover:bg-green-700"
         >
-          Submit Response
+          {{ submitBtnText }}
         </button>
 
         <button

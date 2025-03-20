@@ -12,11 +12,13 @@ import {
   UserSurveyParsed,
 } from '../../services/user-survey.service';
 import { RespondModalComponent } from '../../components/respond-modal/respond-modal.component';
+import { UserSurveyDetailsModalComponent } from '../../components/user-survey-details-modal/user-survey-details-modal.component';
 
 @Component({
   selector: 'app-user-dashboard',
   imports: [
     RespondModalComponent,
+    UserSurveyDetailsModalComponent,
     MatTableModule,
     CommonModule,
     MatSortModule,
@@ -28,8 +30,7 @@ import { RespondModalComponent } from '../../components/respond-modal/respond-mo
   styleUrls: ['./user-dashboard.component.scss'],
 })
 export class UserDashboardComponent {
-  showModal = false;
-  readonlyMode = false;
+  modal: 'respond' | 'preview' | null = null;
   selectedUserSurvey: UserSurveyParsed | null = null;
   surveys = new MatTableDataSource<UserSurveyParsed>([]);
 
@@ -75,18 +76,18 @@ export class UserDashboardComponent {
     }
   }
 
-  openRespondModal(survey: UserSurveyParsed, readonly = false) {
-    this.showModal = true;
+  openRespondModal(survey: UserSurveyParsed) {
+    this.modal = 'respond';
     this.selectedUserSurvey = survey;
-    this.readonlyMode = readonly;
   }
 
   openPreviewModal(survey: UserSurveyParsed) {
-    this.openRespondModal(survey, true);
+    this.modal = 'preview';
+    this.selectedUserSurvey = survey;
   }
 
   closeModal() {
-    this.showModal = false;
+    this.modal = null;
     this.loadSurveys();
   }
 }

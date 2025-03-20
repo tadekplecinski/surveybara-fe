@@ -1,10 +1,11 @@
-@if(showModal) {
-<app-respond-modal
-  [survey]="selectedUserSurvey"
-  [readonlyMode]="readonlyMode"
-  (close)="closeModal()"
->
+@if(modal === 'respond') {
+<app-respond-modal [survey]="selectedUserSurvey" (close)="closeModal()">
 </app-respond-modal>
+} @if(modal === 'preview') {
+<app-survey-details-modal
+  [surveyDetails]="selectedUserSurvey"
+  (close)="closeModal()"
+></app-survey-details-modal>
 }
 
 <div class="flex flex-col gap-2 items-center items-center justify-center p-6">

@@ -1,0 +1,67 @@
+@if (surveyDetails) {
+<div
+  class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-[1000]"
+>
+  <div
+    class="bg-white w-full max-w-md p-6 rounded-lg shadow-lg relative border border-gray-300"
+  >
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl font-semibold text-gray-800">Survey Details</h2>
+      <p
+        class="px-2 py-1 text-sm rounded-md"
+        [ngClass]="{
+          'bg-green-200 text-green-800': surveyDetails.status === 'submitted',
+          'bg-yellow-200 text-yellow-800': surveyDetails.status === 'draft'
+        }"
+      >
+        {{ surveyDetails.status | titlecase }}
+      </p>
+    </div>
+
+    <div class="space-y-3 mt-4">
+      <div class="flex justify-between gap-5">
+        <span class="block text-m font-medium text-gray-900">Title:</span>
+        <p class="text-m font-medium text-gray-500">
+          {{ surveyDetails.title }}
+        </p>
+      </div>
+
+      <div class="flex justify-between gap-5">
+        <span class="block text-m font-medium text-gray-900">Created At:</span>
+        <p class="text-m font-medium text-gray-500">
+          {{ surveyDetails.createdAt | date : "medium" }}
+        </p>
+      </div>
+
+      <div class="flex justify-between gap-5">
+        <span class="block text-m font-medium text-gray-900"
+          >Last Updated:</span
+        >
+        <p class="text-m font-medium text-gray-500">
+          {{ surveyDetails.updatedAt | date : "medium" }}
+        </p>
+      </div>
+
+      @if (questionAnswerPairs.length > 0) {
+      <div class="mt-4">
+        <h3 class="text-lg font-semibold text-gray-800">Questions & Answers</h3>
+        <div *ngFor="let qa of questionAnswerPairs" class="mt-2">
+          <p class="font-medium text-gray-900">{{ qa.question }}</p>
+          <p class="pl-4 text-gray-700">{{ qa.answer }}</p>
+        </div>
+      </div>
+      }
+    </div>
+
+    <div class="flex justify-end gap-3 mt-4">
+      <button
+        type="button"
+        (click)="closeModal()"
+        class="px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+}

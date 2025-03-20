@@ -23,7 +23,6 @@ export class RespondModalComponent {
 
   @Output() close = new EventEmitter<void>();
   @Input() survey: UserSurveyParsed | null = null;
-  @Input() readonlyMode = false;
 
   surveyForm: FormGroup;
   errorMessage: string | null = null;
@@ -33,6 +32,12 @@ export class RespondModalComponent {
       answers: this.fb.array([]),
       status: ['draft', Validators.required],
     });
+  }
+
+  get submitBtnText() {
+    return this.surveyForm.get('status')?.value === 'draft'
+      ? 'Save Draft'
+      : 'Submit';
   }
 
   get isSurveyValid() {
@@ -67,10 +72,6 @@ export class RespondModalComponent {
         })
       );
     });
-
-    if (this.readonlyMode) {
-      this.surveyForm.disable();
-    }
   }
 
   closeModal() {
@@ -80,19 +81,6 @@ export class RespondModalComponent {
 
   onSubmit() {
     if (this.surveyForm.invalid) return;
-
-    console.log('this.surveyForm.value', this.surveyForm.value);
-
-    // const updatedSurvey = {
-    //   id: this.survey?.id!,
-    //   answers: this.surveyForm.value.questions.map((q: any) => ({
-    //     questionId: q.questionId,
-    //     answer: q.answer,
-    //   })),
-    // };
-
-    // console.log('this.surveyForm.value', this.surveyForm.value);
-    // return;
 
     this.userSurveyService
       .updateUserSurvey(this.survey!.id, this.surveyForm.value)
