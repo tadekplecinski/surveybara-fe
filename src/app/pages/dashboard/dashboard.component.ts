@@ -79,6 +79,11 @@ export class DashboardComponent {
     this.searchSubject.next(search);
   }
 
+  clearSearch() {
+    this.searchTitle = '';
+    this.onSearchChange('');
+  }
+
   loadSurveys(search?: string) {
     this.surveysSubscription = this.surveyService.getSurveys(search).subscribe({
       next: (data) => {
