@@ -1,5 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
-import { Subscription } from 'rxjs';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  Subject,
+  Subscription,
+} from 'rxjs';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -12,6 +17,7 @@ import { Survey, SurveyService } from '../../services/survey.service';
 import { UpdateSurveyModalComponent } from '../../components/update-survey-modal/update-survey-modal.component';
 import { InviteUserModalComponent } from '../../components/invite-user-modal/invite-user-modal.component';
 import { SurveyDetailsModalComponent } from '../../components/survey-details-modal/survey-details-modal.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-dashboard',
@@ -26,6 +32,7 @@ import { SurveyDetailsModalComponent } from '../../components/survey-details-mod
     MatMenuModule,
     MatIconModule,
     MatButtonModule,
+    FormsModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
@@ -37,6 +44,9 @@ export class DashboardComponent {
 
   @ViewChild(MatSort) sort!: MatSort;
   selectedSurvey: Survey | null = null;
+
+  searchTitle = '';
+  private searchSubject = new Subject<string>();
 
   surveys = new MatTableDataSource<Survey>([]);
   displayedColumns: string[] = [
@@ -57,10 +67,20 @@ export class DashboardComponent {
 
   ngOnInit(): void {
     this.loadSurveys();
+
+    this.searchSubject
+      .pipe(debounceTime(400), distinctUntilChanged())
+      .subscribe((search) => {
+        this.loadSurveys(search);
+      });
   }
 
-  loadSurveys() {
-    this.surveysSubscription = this.surveyService.getSurveys().subscribe({
+  onSearchChange(search: string) {
+    this.searchSubject.next(search);
+  }
+
+  loadSurveys(search?: string) {
+    this.surveysSubscription = this.surveyService.getSurveys(search).subscribe({
       next: (data) => {
         this.surveys.data = data;
       },

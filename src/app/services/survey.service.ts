@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
@@ -88,7 +88,7 @@ export class SurveyService {
     );
   }
 
-  getSurveys(): Observable<Survey[]> {
+  getSurveys(search?: string): Observable<Survey[]> {
     const token = this.authService.getToken();
     if (!token) {
       return throwError(() => new Error('No authorization token found.'));
@@ -98,10 +98,15 @@ export class SurveyService {
       Authorization: `Bearer ${token}`,
     });
 
+    let params = new HttpParams();
+    if (search) {
+      params = params.set('title', search);
+    }
+
     return this.http
       .get<{ success: boolean; data: Survey[] }>(
         `${this.apiUrl}/admin/surveys`,
-        { headers }
+        { headers, params }
       )
       .pipe(
         map((response) => {

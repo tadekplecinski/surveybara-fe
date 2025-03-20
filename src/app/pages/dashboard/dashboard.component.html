@@ -16,6 +16,13 @@
 }
 
 <div class="flex flex-col gap-2 items-center items-center justify-center p-6">
+  <input
+    type="text"
+    [(ngModel)]="searchTitle"
+    (input)="onSearchChange(searchTitle)"
+    placeholder="Search title..."
+    class="w-full max-w-sm px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+  />
   <button
     (click)="openCreateModal()"
     class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
