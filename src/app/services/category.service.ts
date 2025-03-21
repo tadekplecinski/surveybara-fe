@@ -6,7 +6,12 @@ export interface Category {
   id: number;
   name: string;
   status: 'active' | 'archived';
+  description: string;
+  createdAt: string;
+  updatedAt: string;
 }
+
+export type CategoryPayload = Pick<Category, 'name' | 'status' | 'description'>;
 
 export interface CategoriesResponse {
   success: boolean;
@@ -54,6 +59,72 @@ export class CategoryService {
 
           if (error.status === 400) {
             errorMessage = 'Invalid request.';
+          }
+
+          return throwError(() => new Error(errorMessage));
+        })
+      );
+  }
+
+  createCategory(
+    payload: CategoryPayload
+  ): Observable<{ success: boolean; message: string }> {
+    const token = this.getToken();
+
+    if (!token) {
+      return throwError(() => new Error('No authorization token found.'));
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+
+    return this.http
+      .post<{ success: boolean; message: string }>(
+        `${this.apiUrl}/category`,
+        payload,
+        { headers }
+      )
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to create category:', error);
+          let errorMessage =
+            'Failed to create category. Please try again later.';
+
+          if (error.status === 400) {
+            errorMessage = 'Invalid category data. Please check your input.';
+          } else if (error.status === 403) {
+            errorMessage =
+              'Permission denied. Only admins can create categories.';
+          }
+
+          return throwError(() => new Error(errorMessage));
+        })
+      );
+  }
+
+  archiveCategory(categoryId: number): Observable<any> {
+    const token = this.getToken();
+
+    if (!token) {
+      return throwError(() => new Error('No authorization token found.'));
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+
+    return this.http
+      .patch(`${this.apiUrl}/categories/${categoryId}/archive`, {}, { headers })
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to archive category:', error);
+          let errorMessage =
+            'Failed to archive category. Please try again later.';
+
+          if (error.status === 400) {
+            errorMessage = 'Category cannot be archived.';
           }
 
           return throwError(() => new Error(errorMessage));

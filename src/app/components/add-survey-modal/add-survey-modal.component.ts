@@ -44,7 +44,7 @@ export class AddSurveyModalComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.surveyForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
-      categoryIds: [],
+      categoryIds: [[]],
       questions: this.fb.array([]),
       status: ['draft', [Validators.required, this.statusValidator.bind(this)]],
     });
@@ -79,7 +79,7 @@ export class AddSurveyModalComponent implements OnInit, OnDestroy {
   loadCategories(): void {
     this.categoryService.fetchCategories().subscribe({
       next: (categories) => {
-        this.categories = categories;
+        this.categories = categories.filter((c) => c.status === 'active');
       },
       error: (err) => {
         this.errorMessage = err.message;
@@ -111,12 +111,15 @@ export class AddSurveyModalComponent implements OnInit, OnDestroy {
     this.surveyService.createSurvey(this.surveyForm.value).subscribe({
       next: () => {
         this.closeModal();
-        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         this.errorMessage = err.message;
         console.error('Survey creation error:', err);
       },
     });
+  }
+
+  get title() {
+    return this.surveyForm.get('title');
   }
 }

@@ -19,8 +19,7 @@
           class="mt-1 block w-full p-2 border rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
         />
 
-        @if ( surveyForm.get('title')?.invalid &&
-        surveyForm.get('title')?.touched) {
+        @if ( title?.invalid && title?.touched) {
         <small class="text-red-500 text-sm"
           >Title is required (min. 3 characters)</small
         >
@@ -62,6 +61,9 @@
             X
           </button>
         </div>
+        <div *ngIf="questions.at(i)?.invalid && questions.at(i)?.touched">
+          <small class="text-red-500 text-sm"> Question is required </small>
+        </div>
         }
         <button
           type="button"
@@ -72,7 +74,6 @@
         </button>
       </div>
 
-      <!-- Status Selection -->
       <div class="form-group">
         <label for="status" class="block text-sm font-medium text-gray-700"
           >Status</label

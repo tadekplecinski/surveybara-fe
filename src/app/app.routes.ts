@@ -6,6 +6,7 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { authGuard } from './guards/auth.guard';
 import { redirectIfAuthenticatedGuard } from './guards/auth-redirect.guard';
 import { UserDashboardComponent } from './pages/user-dashboard/user-dashboard.component';
+import { CategoriesComponent } from './pages/categories/categories.component';
 
 export const routes: Routes = [
   {
@@ -32,6 +33,12 @@ export const routes: Routes = [
     component: UserDashboardComponent,
     canActivate: [authGuard],
     data: { role: 'user' },
+  },
+  {
+    path: 'categories',
+    component: CategoriesComponent,
+    canActivate: [authGuard],
+    data: { role: 'admin' },
   },
   { path: '**', redirectTo: '/' },
 ];

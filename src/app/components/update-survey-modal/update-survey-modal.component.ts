@@ -68,7 +68,7 @@ export class UpdateSurveyModalComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (categories) => {
-          this.categories = categories;
+          this.categories = categories.filter((c) => c.status === 'active');
         },
         error: (err) => {
           this.errorMessage = err.message;
